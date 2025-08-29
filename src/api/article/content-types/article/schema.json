@@ -53,6 +53,32 @@
         "shared.rich-text",
         "shared.slider"
       ]
+    },
+    "excerpt": {
+      "type": "text"
+    },
+    "readTime": {
+      "type": "integer"
+    },
+    "views": {
+      "type": "integer"
+    },
+    "likes": {
+      "type": "integer"
+    },
+    "comments": {
+      "type": "integer"
+    },
+    "featured": {
+      "type": "boolean",
+      "default": false
+    },
+    "trending": {
+      "type": "boolean",
+      "default": false
+    },
+    "tags": {
+      "type": "json"
     }
   }
 }

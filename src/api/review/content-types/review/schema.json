@@ -61,6 +61,9 @@
     },
     "visitDate": {
       "type": "date"
+    },
+    "author": {
+      "type": "string"
     }
   }
 }
