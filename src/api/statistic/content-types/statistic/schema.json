@@ -1,0 +1,49 @@
+{
+  "kind": "collectionType",
+  "collectionName": "statistics",
+  "info": {
+    "singularName": "statistic",
+    "pluralName": "statistics",
+    "displayName": "statistic"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "description": {
+      "type": "text"
+    },
+    "period": {
+      "type": "string"
+    },
+    "value": {
+      "type": "integer",
+      "required": true
+    },
+    "change": {
+      "type": "decimal"
+    },
+    "changeType": {
+      "type": "enumeration",
+      "enum": [
+        "increase",
+        "decrease",
+        "neutral"
+      ]
+    },
+    "icon": {
+      "type": "string"
+    },
+    "color": {
+      "type": "string"
+    },
+    "active": {
+      "type": "boolean",
+      "default": true
+    }
+  }
+}
