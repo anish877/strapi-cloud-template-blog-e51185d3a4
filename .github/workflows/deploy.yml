@@ -18,7 +18,7 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           port: ${{ secrets.SERVER_SSH_PORT }}
           timeout: 600s            # 10 minutes for SSH connection
-          command_timeout: 60m     # 20 minutes for docker build or deploy script
+          command_timeout: 360m     # 20 minutes for docker build or deploy script
           script_stop: true        # fail fast on error
           script: |
             cd /root/strapi/backend

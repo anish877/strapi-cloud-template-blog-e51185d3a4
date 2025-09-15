@@ -4,37 +4,82 @@
   "info": {
     "singularName": "forum-category",
     "pluralName": "forum-categories",
-    "displayName": "Forum Category"
+    "displayName": "Forum Category",
+    "description": "Forum discussion categories"
   },
   "options": {
-    "draftAndPublish": true
+    "draftAndPublish": false
   },
   "pluginOptions": {},
   "attributes": {
-    "category_id_from_discourse": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "slug": {
+      "type": "uid",
+      "targetField": "name",
+      "required": true
+    },
+    "description": {
+      "type": "text"
+    },
+    "icon": {
+      "type": "string",
+      "default": "💬"
+    },
+    "color": {
+      "type": "string",
+      "default": "#3B82F6"
+    },
+    "sortOrder": {
       "type": "integer",
-      "required": true,
-      "unique": true
+      "default": 0
     },
-    "category_name": {
-      "type": "string",
-      "required": true
-    },
-    "display_icon": {
-      "type": "string",
-      "required": true
-    },
-    "display_color": {
-      "type": "string",
-      "required": true
-    },
-    "is_active": {
+    "isActive": {
       "type": "boolean",
       "default": true
     },
-    "sort_order": {
+    "topics": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::forum-topic.forum-topic",
+      "mappedBy": "category"
+    },
+    "topicCount": {
       "type": "integer",
       "default": 0
+    },
+    "postCount": {
+      "type": "integer",
+      "default": 0
+    },
+    "lastActivity": {
+      "type": "datetime"
+    },
+    "lastTopic": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::forum-topic.forum-topic"
+    },
+    "parentCategory": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::forum-category.forum-category"
+    },
+    "subCategories": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::forum-category.forum-category",
+      "mappedBy": "parentCategory"
+    },
+    "permissions": {
+      "type": "json",
+      "default": {
+        "canView": ["authenticated"],
+        "canPost": ["authenticated"],
+        "canModerate": ["admin"]
+      }
     }
   }
 }

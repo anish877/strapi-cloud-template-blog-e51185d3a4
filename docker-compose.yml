@@ -5,13 +5,27 @@ volumes:
     driver: local
   strapi-uploads:
     driver: local
+  postgres_data:          # new volume for Postgres
+    driver: local
 
 networks:
   strapi-network:
-    name: strapi-network
     driver: bridge
 
 services:
+  postgres:
+    image: postgres:15
+    container_name: strapi-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: strapi
+      POSTGRES_PASSWORD: yourpassword
+      POSTGRES_DB: strapi
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - strapi-network
+
   strapi:
     container_name: strapi-app
     platform: linux/amd64
@@ -22,27 +36,25 @@ services:
     restart: unless-stopped
     env_file: .env
     environment:
-      - NODE_ENV=${NODE_ENV:-development}
-      - DATABASE_CLIENT=sqlite
-      - DATABASE_FILENAME=/opt/app/data/data.db
-      - JWT_SECRET=${JWT_SECRET}
-      - ADMIN_JWT_SECRET=${ADMIN_JWT_SECRET}
-      - APP_KEYS=${APP_KEYS}
-      - API_TOKEN_SALT=${API_TOKEN_SALT}
-      - TRANSFER_TOKEN_SALT=${TRANSFER_TOKEN_SALT}
-      - HOST=${HOST:-0.0.0.0}
-      - PORT=${PORT:-1337}
+      NODE_ENV: ${NODE_ENV:-production}
+      DATABASE_CLIENT: postgres
+      DATABASE_HOST: postgres
+      DATABASE_PORT: 5432
+      DATABASE_NAME: strapi
+      DATABASE_USERNAME: strapi
+      DATABASE_PASSWORD: yourpassword
+      JWT_SECRET: ${JWT_SECRET}
+      ADMIN_JWT_SECRET: ${ADMIN_JWT_SECRET}
+      APP_KEYS: ${APP_KEYS}
+      API_TOKEN_SALT: ${API_TOKEN_SALT}
+      TRANSFER_TOKEN_SALT: ${TRANSFER_TOKEN_SALT}
+      HOST: ${HOST:-0.0.0.0}
+      PORT: ${PORT:-1337}
     volumes:
-      - ./public/uploads:/opt/app/public/uploads
-      - strapi_data:/opt/app/data
       - strapi-uploads:/opt/app/public/uploads
     ports:
       - "${PORT:-1337}:1337"
+    depends_on:
+      - postgres
     networks:
       - strapi-network
-    healthcheck:
-      test: ["CMD", "node", "healthcheck.js"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s

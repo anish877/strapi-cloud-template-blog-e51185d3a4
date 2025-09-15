@@ -2,7 +2,7 @@
 
 ## 🎯 Current Status
 
-✅ **Strapi Server**: Running at https://api.pattaya1.com/
+✅ **Strapi Server**: Running at http://localhost:1337/
 ✅ **News Articles API**: Working (`/api/news-articles`)
 ❌ **News Sources API**: Not available (`/api/news-sources` returns 404)
 
@@ -19,7 +19,7 @@ The news-source content type exists in the codebase but the API endpoint is not 
 ### Option 1: Admin Panel Configuration (Recommended)
 
 1. **Access Admin Panel**
-   - Go to: https://api.pattaya1.com/admin
+   - Go to: http://localhost:1337/admin
    - Login with your admin credentials
 
 2. **Publish News Source Content Type**
@@ -100,10 +100,10 @@ Once the API is working, test with:
 
 ```bash
 # Test GET endpoint
-curl "https://api.pattaya1.com/api/news-sources"
+curl "http://localhost:1337/api/news-sources"
 
 # Test POST endpoint
-curl -X POST "https://api.pattaya1.com/api/news-sources" \
+curl -X POST "http://localhost:1337/api/news-sources" \
   -H "Content-Type: application/json" \
   -d '{"data":{"name":"Test Source","url":"https://example.com","sourceType":"rss","isActive":true}}'
 ```

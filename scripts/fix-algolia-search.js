@@ -15,7 +15,7 @@ async function fixAlgoliaFlightSearch() {
     
     // Fetch flight data
     console.log('2️⃣ Fetching flight data...');
-    const response = await axios.get('https://api.pattaya1.com/api/flight-trackers');
+    const response = await axios.get('http://localhost:1337/api/flight-trackers');
     const flights = response.data.data;
     
     console.log(`Found ${flights.length} flights to index`);

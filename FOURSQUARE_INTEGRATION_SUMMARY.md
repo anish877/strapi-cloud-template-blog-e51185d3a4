@@ -132,13 +132,13 @@ node test-review-fetch.js
 ### **API Endpoints**
 ```bash
 # Get latest reviews
-curl "https://api.pattaya1.com/api/reviews/latest?limit=10"
+curl "http://localhost:1337/api/reviews/latest?limit=10"
 
 # Get Foursquare reviews only
-curl "https://api.pattaya1.com/api/reviews/latest?platform=Foursquare&limit=5"
+curl "http://localhost:1337/api/reviews/latest?platform=Foursquare&limit=5"
 
 # Get review statistics
-curl "https://api.pattaya1.com/api/reviews/stats"
+curl "http://localhost:1337/api/reviews/stats"
 ```
 
 ## 📈 **Monitoring**

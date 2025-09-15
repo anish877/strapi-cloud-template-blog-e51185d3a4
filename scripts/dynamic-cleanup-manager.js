@@ -20,7 +20,7 @@ class DynamicCleanupManager {
 
   async getCurrentSettings() {
     try {
-      const response = await axios.get('https://api.pattaya1.com/api/news-settings');
+      const response = await axios.get('http://localhost:1337/api/news-settings');
       return response.data.data;
     } catch (error) {
       console.log(`⚠️  Could not fetch settings: ${error.message}`);
@@ -30,7 +30,7 @@ class DynamicCleanupManager {
 
   async getCurrentArticleCount() {
     try {
-      const response = await axios.get('https://api.pattaya1.com/api/breaking-news-plural?sort=createdAt:desc&pagination[limit]=200');
+      const response = await axios.get('http://localhost:1337/api/breaking-news-plural?sort=createdAt:desc&pagination[limit]=200');
       return response.data.data;
     } catch (error) {
       console.log(`❌ Failed to fetch articles: ${error.message}`);
@@ -81,7 +81,7 @@ class DynamicCleanupManager {
       
       for (const article of articlesToDelete) {
         try {
-          await axios.delete(`https://api.pattaya1.com/api/breaking-news-plural/${article.id}`);
+          await axios.delete(`http://localhost:1337/api/breaking-news-plural/${article.id}`);
           console.log(`   ✅ Deleted: ${article.Title.substring(0, 40)}... ${article.IsBreaking ? '(BREAKING)' : ''}`);
           deletedCount++;
           if (article.IsBreaking) deletedBreaking++;

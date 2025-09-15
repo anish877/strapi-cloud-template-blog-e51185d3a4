@@ -1,0 +1,28 @@
+{
+  "collectionName": "components_shared_coordinates",
+  "info": {
+    "displayName": "Coordinates",
+    "description": "Geographic coordinates for location data"
+  },
+  "options": {},
+  "attributes": {
+    "latitude": {
+      "type": "decimal",
+      "required": true
+    },
+    "longitude": {
+      "type": "decimal",
+      "required": true
+    },
+    "address": {
+      "type": "string"
+    },
+    "city": {
+      "type": "string"
+    },
+    "country": {
+      "type": "string",
+      "default": "Thailand"
+    }
+  }
+}

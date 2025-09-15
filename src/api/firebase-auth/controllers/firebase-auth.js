@@ -14,7 +14,8 @@ module.exports = {
       // If email missing, try to resolve from Firebase Admin
       if (!email) {
         try {
-          const fbUser = await strapi.firebase.auth().getUser(firebaseUid);
+          // @ts-ignore
+          const fbUser = await strapi.firebase?.auth().getUser(firebaseUid);
           email = fbUser?.email || '';
           console.log('📧 Resolved email from Firebase Admin:', email || 'none');
         } catch (e) {
@@ -200,6 +201,7 @@ module.exports = {
           username: user.username,
           email: user.email,
           firebaseUid: user.firebaseUid,
+          // @ts-ignore
           role: user.role?.name
         }
       });

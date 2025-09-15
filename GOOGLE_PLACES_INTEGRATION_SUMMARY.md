@@ -92,7 +92,7 @@ GOOGLE_PLACES_API_KEY=AIzaSyCKY3PBPFHN5AKC4vcytYyo8O6LKXqY5OY
 
 2. **Test the API**:
    ```bash
-   curl "https://api.pattaya1.com/api/reviews/latest?limit=3" | jq .
+   curl "http://localhost:1337/api/reviews/latest?limit=3" | jq .
    ```
 
 3. **Run test script**:

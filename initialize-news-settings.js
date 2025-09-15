@@ -1,7 +1,7 @@
 const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 
 async function initializeNewsSettings() {
-  const baseUrl = 'https://api.pattaya1.com/api';
+  const baseUrl = 'http://localhost:1337/api';
   
   console.log('🚀 Initializing News Settings...\n');
 

@@ -1,0 +1,132 @@
+{
+  "kind": "collectionType",
+  "collectionName": "forum_topics",
+  "info": {
+    "singularName": "forum-topic",
+    "pluralName": "forum-topics",
+    "displayName": "Forum Topic",
+    "description": "Forum discussion topics"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "slug": {
+      "type": "uid",
+      "targetField": "title",
+      "required": true
+    },
+    "content": {
+      "type": "richtext",
+      "required": true
+    },
+    "excerpt": {
+      "type": "text"
+    },
+    "author": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "required": true
+    },
+    "category": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::forum-category.forum-category",
+      "required": true
+    },
+    "posts": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::forum-post.forum-post",
+      "mappedBy": "topic"
+    },
+    "postCount": {
+      "type": "integer",
+      "default": 0
+    },
+    "viewCount": {
+      "type": "integer",
+      "default": 0
+    },
+    "lastActivity": {
+      "type": "datetime"
+    },
+    "lastPost": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::forum-post.forum-post"
+    },
+    "isPinned": {
+      "type": "boolean",
+      "default": false
+    },
+    "isLocked": {
+      "type": "boolean",
+      "default": false
+    },
+    "isHot": {
+      "type": "boolean",
+      "default": false
+    },
+    "isSolved": {
+      "type": "boolean",
+      "default": false
+    },
+    "bestAnswer": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::forum-post.forum-post"
+    },
+    "tags": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::hashtag.hashtag"
+    },
+    "reactions": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::forum-reaction.forum-reaction",
+      "mappedBy": "topic"
+    },
+    "reactionCounts": {
+      "type": "json",
+      "default": {
+        "like": 0,
+        "love": 0,
+        "laugh": 0,
+        "wow": 0,
+        "sad": 0,
+        "angry": 0
+      }
+    },
+    "userReactions": {
+      "type": "json",
+      "default": {}
+    },
+    "moderationStatus": {
+      "type": "enumeration",
+      "enum": ["pending", "approved", "rejected", "quarantined"],
+      "default": "approved"
+    },
+    "moderationNotes": {
+      "type": "text"
+    },
+    "reports": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::forum-report.forum-report",
+      "mappedBy": "topic"
+    },
+    "attachments": {
+      "type": "media",
+      "multiple": true,
+      "allowedTypes": ["images", "files", "videos", "audios"]
+    }
+  }
+}

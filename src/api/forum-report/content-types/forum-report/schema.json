@@ -1,0 +1,65 @@
+{
+  "kind": "collectionType",
+  "collectionName": "forum_reports",
+  "info": {
+    "singularName": "forum-report",
+    "pluralName": "forum-reports",
+    "displayName": "Forum Report",
+    "description": "User reports for forum content moderation"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "reason": {
+      "type": "enumeration",
+      "enum": [
+        "spam",
+        "harassment",
+        "inappropriate_content",
+        "illegal_content",
+        "personal_attack",
+        "off_topic",
+        "duplicate",
+        "other"
+      ],
+      "required": true
+    },
+    "description": {
+      "type": "text"
+    },
+    "reporter": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "required": true
+    },
+    "post": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::forum-post.forum-post"
+    },
+    "topic": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::forum-topic.forum-topic"
+    },
+    "status": {
+      "type": "enumeration",
+      "enum": ["pending", "reviewed", "resolved", "dismissed"],
+      "default": "pending"
+    },
+    "moderatorNotes": {
+      "type": "text"
+    },
+    "moderatedBy": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user"
+    },
+    "moderatedAt": {
+      "type": "datetime"
+    }
+  }
+}

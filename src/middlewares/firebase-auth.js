@@ -57,6 +57,10 @@ module.exports = (config, { strapi }) => {
       console.log('🔥 No token found, skipping authentication');
       return next();
     }
+    
+    console.log('🔥 Token found, length:', token.length);
+    console.log('🔥 Token preview:', token.substring(0, 50) + '...');
+    console.log('🔥 Full token for debugging:', token);
 
     try {
       // First try to verify as Strapi JWT
@@ -75,12 +79,14 @@ module.exports = (config, { strapi }) => {
           }
         }
       } catch (jwtError) {
+        console.log('🔥 JWT verification failed, trying Firebase token:', jwtError.message);
         // JWT verification failed, try Firebase token if admin is initialized
         try {
           if (!strapi.firebase?.apps?.length) {
-            console.log('Firebase Admin not initialized. Skipping Firebase token verification.');
+            console.log('🔥 Firebase Admin not initialized. Skipping Firebase token verification.');
             return next();
           }
+          console.log('🔥 Attempting Firebase token verification...');
           const decodedToken = await strapi.firebase.auth().verifyIdToken(token);
           
           if (decodedToken && decodedToken.uid) {
@@ -109,6 +115,53 @@ module.exports = (config, { strapi }) => {
               return next();
             } else {
               console.log('❌ User not found or blocked');
+              
+              // Auto-create user if not found
+              if (users.length === 0) {
+                console.log('🔄 Auto-creating user for Firebase UID:', decodedToken.uid);
+                try {
+                  // Get default authenticated role
+                  const defaultRole = await strapi.query('plugin::users-permissions.role').findOne({
+                    where: { type: 'authenticated' },
+                  });
+
+                  if (!defaultRole) {
+                    console.log('❌ Default role not found, cannot create user');
+                    return next();
+                  }
+
+                  // Create user data
+                  const userData = {
+                    username: decodedToken.email ? decodedToken.email.split('@')[0] : `user-${decodedToken.uid.slice(0, 6)}`,
+                    email: decodedToken.email || `${decodedToken.uid}@no-email.firebase`,
+                    firebaseUid: decodedToken.uid,
+                    confirmed: true,
+                    blocked: false,
+                    provider: 'firebase',
+                    role: defaultRole.id
+                  };
+
+                  // Ensure username is unique
+                  const existingUsername = await strapi.entityService.findMany('plugin::users-permissions.user', {
+                    filters: { username: userData.username }
+                  });
+                  
+                  if (existingUsername && existingUsername.length > 0) {
+                    const suffix = String(Date.now()).slice(-4);
+                    userData.username = `${userData.username}-${suffix}`;
+                  }
+
+                  const newUser = await strapi.entityService.create('plugin::users-permissions.user', {
+                    data: userData
+                  });
+
+                  console.log('✅ Auto-created user:', newUser.id);
+                  ctx.state.user = newUser;
+                  return next();
+                } catch (createError) {
+                  console.error('❌ Failed to auto-create user:', createError);
+                }
+              }
             }
           }
         } catch (firebaseError) {

@@ -116,7 +116,7 @@ const restaurants = [
 ];
 
 async function seedRestaurants() {
-  const baseUrl = process.env.STRAPI_URL || 'https://api.pattaya1.com';
+  const baseUrl = process.env.STRAPI_URL || 'http://localhost:1337';
   
   try {
     console.log('🌱 Starting restaurant seeding via API...');

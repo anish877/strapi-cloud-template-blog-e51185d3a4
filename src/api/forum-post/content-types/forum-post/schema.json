@@ -1,0 +1,112 @@
+{
+  "kind": "collectionType",
+  "collectionName": "forum_posts",
+  "info": {
+    "singularName": "forum-post",
+    "pluralName": "forum-posts",
+    "displayName": "Forum Post",
+    "description": "Individual posts within forum topics"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "content": {
+      "type": "richtext",
+      "required": true
+    },
+    "author": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "required": true
+    },
+    "topic": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::forum-topic.forum-topic"
+    },
+    "parentPost": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::forum-post.forum-post"
+    },
+    "isBestAnswer": {
+      "type": "boolean",
+      "default": false
+    },
+    "isEdited": {
+      "type": "boolean",
+      "default": false
+    },
+    "editedAt": {
+      "type": "datetime"
+    },
+    "editReason": {
+      "type": "string"
+    },
+    "reactions": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::forum-reaction.forum-reaction",
+      "mappedBy": "post"
+    },
+    "reactionCounts": {
+      "type": "json",
+      "default": {
+        "like": 0,
+        "love": 0,
+        "laugh": 0,
+        "wow": 0,
+        "sad": 0,
+        "angry": 0
+      }
+    },
+    "userReactions": {
+      "type": "json",
+      "default": {}
+    },
+    "viewCount": {
+      "type": "integer",
+      "default": 0
+    },
+    "isPinned": {
+      "type": "boolean",
+      "default": false
+    },
+    "isLocked": {
+      "type": "boolean",
+      "default": false
+    },
+    "moderationStatus": {
+      "type": "enumeration",
+      "enum": ["pending", "approved", "rejected", "quarantined"],
+      "default": "approved"
+    },
+    "moderationNotes": {
+      "type": "text"
+    },
+    "reports": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::forum-report.forum-report",
+      "mappedBy": "post"
+    },
+    "mentions": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "plugin::users-permissions.user"
+    },
+    "hashtags": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::hashtag.hashtag"
+    },
+    "attachments": {
+      "type": "media",
+      "multiple": true,
+      "allowedTypes": ["images", "files", "videos", "audios"]
+    }
+  }
+}

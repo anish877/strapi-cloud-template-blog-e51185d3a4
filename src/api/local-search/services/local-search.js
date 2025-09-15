@@ -198,7 +198,7 @@ module.exports = createCoreService('api::local-search.local-search', ({ strapi }
 
   // Generate URL for entity
   generateUrl(entity, contentType) {
-    const baseUrl = strapi.config.get('server.url', 'https://api.pattaya1.com');
+    const baseUrl = strapi.config.get('server.url', 'http://localhost:1337');
     return `${baseUrl}/api/${contentType}s/${entity.documentId || entity.id}`;
   },
 

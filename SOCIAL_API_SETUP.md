@@ -58,7 +58,7 @@ Once you've added the API keys:
 1. Restart your Strapi server
 2. Test the social feed endpoint:
    ```bash
-   curl "https://api.pattaya1.com/api/social-feed/live?keywords=Pattaya&limit=5"
+   curl "http://localhost:1337/api/social-feed/live?keywords=Pattaya&limit=5"
    ```
 
 ## Fallback Behavior

@@ -1,5 +1,6 @@
 'use strict';
 
+// @ts-nocheck
 /**
  * Video Scheduler Service
  * Automated video fetching and management for Featured Videos Widget
@@ -8,7 +9,8 @@
 const cron = require('node-cron');
 
 class VideoScheduler {
-  constructor() {
+  constructor(strapi) {
+    this.strapi = strapi;
     this.isRunning = false;
     this.scheduledTasks = new Map();
     this.lastRun = null;
@@ -35,10 +37,12 @@ class VideoScheduler {
       // Statistics update every 6 hours
       this.scheduleStatsUpdate('0 */6 * * *', 'stats-update');
 
-      strapi.log.info('Phase 3 Video Scheduler initialized successfully');
+      // @ts-ignore
+      this.strapi.log.info('Phase 3 Video Scheduler initialized successfully');
       this.isRunning = true;
     } catch (error) {
-      strapi.log.error('Error initializing Phase 3 Video Scheduler:', error);
+      // @ts-ignore
+      this.strapi.log.error('Error initializing Phase 3 Video Scheduler:', error);
       throw error;
     }
   }
@@ -51,14 +55,15 @@ class VideoScheduler {
   scheduleVideoFetching(cronExpression, taskId) {
     const task = cron.schedule(cronExpression, async () => {
       try {
-        strapi.log.info(`Starting scheduled video fetching: ${taskId}`);
+        this.strapi.log.info(`Starting scheduled video fetching: ${taskId}`);
         await this.performVideoFetching();
         this.lastRun = new Date();
-        strapi.log.info(`Completed scheduled video fetching: ${taskId}`);
+        this.strapi.log.info(`Completed scheduled video fetching: ${taskId}`);
       } catch (error) {
-        strapi.log.error(`Error in scheduled video fetching ${taskId}:`, error);
+        this.strapi.log.error(`Error in scheduled video fetching ${taskId}:`, error);
       }
     }, {
+      // @ts-ignore
       scheduled: false,
       timezone: 'Asia/Bangkok'
     });
@@ -66,7 +71,7 @@ class VideoScheduler {
     this.scheduledTasks.set(taskId, task);
     task.start();
     
-    strapi.log.info(`Scheduled video fetching task: ${taskId} with cron: ${cronExpression}`);
+    this.strapi.log.info(`Scheduled video fetching task: ${taskId} with cron: ${cronExpression}`);
   }
 
   /**
@@ -77,13 +82,14 @@ class VideoScheduler {
   scheduleVideoCleanup(cronExpression, taskId) {
     const task = cron.schedule(cronExpression, async () => {
       try {
-        strapi.log.info(`Starting scheduled video cleanup: ${taskId}`);
+        this.strapi.log.info(`Starting scheduled video cleanup: ${taskId}`);
         await this.performVideoCleanup();
-        strapi.log.info(`Completed scheduled video cleanup: ${taskId}`);
+        this.strapi.log.info(`Completed scheduled video cleanup: ${taskId}`);
       } catch (error) {
-        strapi.log.error(`Error in scheduled video cleanup ${taskId}:`, error);
+        this.strapi.log.error(`Error in scheduled video cleanup ${taskId}:`, error);
       }
     }, {
+      // @ts-ignore
       scheduled: false,
       timezone: 'Asia/Bangkok'
     });
@@ -91,7 +97,7 @@ class VideoScheduler {
     this.scheduledTasks.set(taskId, task);
     task.start();
     
-    strapi.log.info(`Scheduled video cleanup task: ${taskId} with cron: ${cronExpression}`);
+    this.strapi.log.info(`Scheduled video cleanup task: ${taskId} with cron: ${cronExpression}`);
   }
 
   /**
@@ -102,13 +108,14 @@ class VideoScheduler {
   scheduleStatsUpdate(cronExpression, taskId) {
     const task = cron.schedule(cronExpression, async () => {
       try {
-        strapi.log.info(`Starting scheduled stats update: ${taskId}`);
+        this.strapi.log.info(`Starting scheduled stats update: ${taskId}`);
         await this.performStatsUpdate();
-        strapi.log.info(`Completed scheduled stats update: ${taskId}`);
+        this.strapi.log.info(`Completed scheduled stats update: ${taskId}`);
       } catch (error) {
-        strapi.log.error(`Error in scheduled stats update ${taskId}:`, error);
+        this.strapi.log.error(`Error in scheduled stats update ${taskId}:`, error);
       }
     }, {
+      // @ts-ignore
       scheduled: false,
       timezone: 'Asia/Bangkok'
     });
@@ -116,7 +123,7 @@ class VideoScheduler {
     this.scheduledTasks.set(taskId, task);
     task.start();
     
-    strapi.log.info(`Scheduled stats update task: ${taskId} with cron: ${cronExpression}`);
+    this.strapi.log.info(`Scheduled stats update task: ${taskId} with cron: ${cronExpression}`);
   }
 
   /**
@@ -129,14 +136,15 @@ class VideoScheduler {
       try {
         const activeTrendingTags = await this.checkActiveTrendingTags();
         if (activeTrendingTags.length > 0) {
-          strapi.log.info(`Starting trending mode fetch: ${taskId} - ${activeTrendingTags.length} active tags`);
+          this.strapi.log.info(`Starting trending mode fetch: ${taskId} - ${activeTrendingTags.length} active tags`);
           await this.performTrendingFetch(activeTrendingTags);
-          strapi.log.info(`Completed trending mode fetch: ${taskId}`);
+          this.strapi.log.info(`Completed trending mode fetch: ${taskId}`);
         }
       } catch (error) {
-        strapi.log.error(`Error in trending mode ${taskId}:`, error);
+        this.strapi.log.error(`Error in trending mode ${taskId}:`, error);
       }
     }, {
+      // @ts-ignore
       scheduled: false,
       timezone: 'Asia/Bangkok'
     });
@@ -144,7 +152,7 @@ class VideoScheduler {
     this.scheduledTasks.set(taskId, task);
     task.start();
     
-    strapi.log.info(`Scheduled trending mode task: ${taskId} with cron: ${cronExpression}`);
+    this.strapi.log.info(`Scheduled trending mode task: ${taskId} with cron: ${cronExpression}`);
   }
 
   /**
@@ -152,7 +160,7 @@ class VideoScheduler {
    */
   async performVideoFetching() {
     try {
-      const videosService = strapi.service('api::video.video');
+      const videosService = this.strapi.service('api::video.video');
       
       // Fetch videos from all active search keywords
       const videos = await videosService.fetchVideosFromKeywords({
@@ -160,14 +168,14 @@ class VideoScheduler {
         saveToDatabase: true
       });
 
-      strapi.log.info(`Automated video fetching completed: ${videos.length} videos processed`);
+      this.strapi.log.info(`Automated video fetching completed: ${videos.length} videos processed`);
       
       // Update scheduler statistics
       await this.updateSchedulerStats('video_fetch', videos.length);
       
       return videos;
     } catch (error) {
-      strapi.log.error('Error in automated video fetching:', error);
+      this.strapi.log.error('Error in automated video fetching:', error);
       await this.updateSchedulerStats('video_fetch_error', 1);
       throw error;
     }
@@ -182,7 +190,7 @@ class VideoScheduler {
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
       // Remove videos older than 30 days with status 'inactive'
-      const deletedVideos = await strapi.entityService.deleteMany('api::video.video', {
+      const deletedVideos = await this.strapi.entityService.deleteMany('api::video.video', {
         filters: {
           $and: [
             { status: 'inactive' },
@@ -191,14 +199,14 @@ class VideoScheduler {
         }
       });
 
-      strapi.log.info(`Video cleanup completed: ${deletedVideos?.count || 0} videos removed`);
+      this.strapi.log.info(`Video cleanup completed: ${deletedVideos?.count || 0} videos removed`);
       
       // Update scheduler statistics
       await this.updateSchedulerStats('video_cleanup', deletedVideos?.count || 0);
       
       return deletedVideos;
     } catch (error) {
-      strapi.log.error('Error in video cleanup:', error);
+      this.strapi.log.error('Error in video cleanup:', error);
       await this.updateSchedulerStats('video_cleanup_error', 1);
       throw error;
     }
@@ -210,7 +218,7 @@ class VideoScheduler {
   async performStatsUpdate() {
     try {
       // Get all search keywords from trending-topic
-      const keywords = await strapi.entityService.findMany('api::trending-topic.trending-topic', {
+      const keywords = await this.strapi.entityService.findMany('api::trending-topic.trending-topic', {
         filters: { active: true }
       });
 
@@ -219,7 +227,7 @@ class VideoScheduler {
       for (const keyword of keywords) {
         try {
           // Calculate success rate based on recent usage
-          const recentVideos = await strapi.entityService.findMany('api::video.video', {
+          const recentVideos = await this.strapi.entityService.findMany('api::video.video', {
             filters: {
               createdAt: { $gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString() } // Last 7 days
             }
@@ -228,7 +236,7 @@ class VideoScheduler {
           const successRate = recentVideos.length > 0 ? Math.min(100, recentVideos.length * 10) : 50;
 
           // Update keyword statistics in trending-topic
-          await strapi.entityService.update('api::trending-topic.trending-topic', keyword.id, {
+          await this.strapi.entityService.update('api::trending-topic.trending-topic', keyword.id, {
             data: {
               last_used: new Date().toISOString()
             }
@@ -236,18 +244,18 @@ class VideoScheduler {
 
           updatedCount++;
         } catch (error) {
-          strapi.log.error(`Error updating stats for keyword ${keyword.keyword}:`, error);
+          this.strapi.log.error(`Error updating stats for keyword ${keyword.keyword}:`, error);
         }
       }
 
-      strapi.log.info(`Keyword stats update completed: ${updatedCount} keywords updated`);
+      this.strapi.log.info(`Keyword stats update completed: ${updatedCount} keywords updated`);
       
       // Update scheduler statistics
       await this.updateSchedulerStats('stats_update', updatedCount);
       
       return updatedCount;
     } catch (error) {
-      strapi.log.error('Error in keyword stats update:', error);
+      this.strapi.log.error('Error in keyword stats update:', error);
       await this.updateSchedulerStats('stats_update_error', 1);
       throw error;
     }
@@ -262,9 +270,9 @@ class VideoScheduler {
     try {
       // For now, just log the statistics
       // In production, you might want to store these in a dedicated statistics table
-      strapi.log.info(`Scheduler Stats - ${operation}: ${count} at ${new Date().toISOString()}`);
+      this.strapi.log.info(`Scheduler Stats - ${operation}: ${count} at ${new Date().toISOString()}`);
     } catch (error) {
-      strapi.log.error('Error updating scheduler stats:', error);
+      this.strapi.log.error('Error updating scheduler stats:', error);
     }
   }
 
@@ -277,7 +285,7 @@ class VideoScheduler {
     if (task) {
       task.stop();
       this.scheduledTasks.delete(taskId);
-      strapi.log.info(`Stopped scheduled task: ${taskId}`);
+      this.strapi.log.info(`Stopped scheduled task: ${taskId}`);
       return true;
     }
     return false;
@@ -289,11 +297,11 @@ class VideoScheduler {
   stopAll() {
     for (const [taskId, task] of this.scheduledTasks) {
       task.stop();
-      strapi.log.info(`Stopped scheduled task: ${taskId}`);
+      this.strapi.log.info(`Stopped scheduled task: ${taskId}`);
     }
     this.scheduledTasks.clear();
     this.isRunning = false;
-    strapi.log.info('All scheduled tasks stopped');
+    this.strapi.log.info('All scheduled tasks stopped');
   }
 
   /**
@@ -313,7 +321,7 @@ class VideoScheduler {
    * Manually trigger video fetching (for testing)
    */
   async triggerVideoFetching() {
-    strapi.log.info('Manually triggering video fetching');
+    this.strapi.log.info('Manually triggering video fetching');
     return await this.performVideoFetching();
   }
 
@@ -321,7 +329,7 @@ class VideoScheduler {
    * Manually trigger video cleanup (for testing)
    */
   async triggerVideoCleanup() {
-    strapi.log.info('Manually triggering video cleanup');
+    this.strapi.log.info('Manually triggering video cleanup');
     return await this.performVideoCleanup();
   }
 
@@ -331,7 +339,7 @@ class VideoScheduler {
    */
   async checkActiveTrendingTags() {
     try {
-      const activeTags = await strapi.entityService.findMany('api::trending-topic.trending-topic', {
+      const activeTags = await this.strapi.entityService.findMany('api::trending-topic.trending-topic', {
         filters: { 
           active: true
         },
@@ -340,7 +348,7 @@ class VideoScheduler {
 
       return Array.isArray(activeTags) ? activeTags : [];
     } catch (error) {
-      strapi.log.error('Error checking active trending tags:', error);
+      this.strapi.log.error('Error checking active trending tags:', error);
       return [];
     }
   }
@@ -351,7 +359,7 @@ class VideoScheduler {
    */
   async performTrendingFetch(trendingTags) {
     try {
-      const videosService = strapi.service('api::video.video');
+      const videosService = this.strapi.service('api::video.video');
       let totalVideos = 0;
 
       for (const tag of trendingTags) {
@@ -366,7 +374,7 @@ class VideoScheduler {
           // Save videos to database with trending priority
           for (const video of videos) {
             try {
-              await strapi.entityService.create('api::video.video', {
+              await this.strapi.entityService.create('api::video.video', {
                 data: {
                   ...video,
                   priority: tag.priority || 5, // Higher priority for trending
@@ -378,14 +386,14 @@ class VideoScheduler {
             } catch (saveError) {
               // Skip duplicates or other save errors
               if (!saveError.message.includes('duplicate')) {
-                strapi.log.error(`Error saving trending video: ${saveError.message}`);
+                this.strapi.log.error(`Error saving trending video: ${saveError.message}`);
               }
             }
           }
 
-          strapi.log.info(`Trending fetch completed for tag "${tag.name}": ${videos.length} videos`);
+          this.strapi.log.info(`Trending fetch completed for tag "${tag.name}": ${videos.length} videos`);
         } catch (error) {
-          strapi.log.error(`Error fetching trending videos for tag "${tag.name}":`, error);
+          this.strapi.log.error(`Error fetching trending videos for tag "${tag.name}":`, error);
         }
       }
 
@@ -394,11 +402,11 @@ class VideoScheduler {
       
       return totalVideos;
     } catch (error) {
-      strapi.log.error('Error in trending fetch:', error);
+      this.strapi.log.error('Error in trending fetch:', error);
       await this.updateSchedulerStats('trending_fetch_error', 1);
       throw error;
     }
   }
 }
 
-module.exports = VideoScheduler;
+module.exports = ({ strapi }) => new VideoScheduler(strapi);

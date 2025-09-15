@@ -247,13 +247,13 @@ node test-admin-news-settings.js
 ### Debug Commands
 ```bash
 # Check current settings
-curl https://api.pattaya1.com/api/news-settings
+curl http://localhost:1337/api/news-settings
 
 # Test manual cleanup
-curl -X POST https://api.pattaya1.com/api/breaking-news/cleanup
+curl -X POST http://localhost:1337/api/breaking-news/cleanup
 
 # Check live endpoint
-curl https://api.pattaya1.com/api/breaking-news/live
+curl http://localhost:1337/api/breaking-news/live
 ```
 
 ## 📈 Monitoring and Analytics

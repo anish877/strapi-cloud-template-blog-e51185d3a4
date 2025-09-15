@@ -1,0 +1,95 @@
+{
+  "kind": "collectionType",
+  "collectionName": "photos",
+  "info": {
+    "singularName": "photo",
+    "pluralName": "photos",
+    "displayName": "Photo",
+    "description": "User-generated photos for Pattaya Pulse gallery"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "image": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images"
+      ],
+      "required": true
+    },
+    "caption": {
+      "type": "text"
+    },
+    "author": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "required": true
+    },
+    "hashtags": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::hashtag.hashtag"
+    },
+    "location": {
+      "type": "component",
+      "repeatable": false,
+      "component": "shared.coordinates",
+      "required": false
+    },
+    "likes": {
+      "type": "integer",
+      "default": 0
+    },
+    "views": {
+      "type": "integer",
+      "default": 0
+    },
+    "width": {
+      "type": "integer"
+    },
+    "height": {
+      "type": "integer"
+    },
+    "orientation": {
+      "type": "enumeration",
+      "enum": [
+        "portrait",
+        "landscape",
+        "square"
+      ]
+    },
+    "status": {
+      "type": "enumeration",
+      "enum": [
+        "pending",
+        "approved",
+        "rejected"
+      ],
+      "default": "pending"
+    },
+    "sponsor_url": {
+      "type": "string"
+    },
+    "featured": {
+      "type": "boolean",
+      "default": false
+    },
+    "uploaded_at": {
+      "type": "datetime",
+      "required": false
+    },
+    "approved_at": {
+      "type": "datetime"
+    },
+    "rejected_at": {
+      "type": "datetime"
+    },
+    "rejection_reason": {
+      "type": "text"
+    }
+  }
+}

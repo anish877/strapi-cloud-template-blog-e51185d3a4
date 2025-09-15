@@ -1,0 +1,37 @@
+{
+  "kind": "collectionType",
+  "collectionName": "forum_reactions",
+  "info": {
+    "singularName": "forum-reaction",
+    "pluralName": "forum-reactions",
+    "displayName": "Forum Reaction",
+    "description": "User reactions to forum posts and topics"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "type": {
+      "type": "enumeration",
+      "enum": ["like", "love", "laugh", "wow", "sad", "angry"],
+      "required": true
+    },
+    "user": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "required": true
+    },
+    "post": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::forum-post.forum-post"
+    },
+    "topic": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::forum-topic.forum-topic"
+    }
+  }
+}
