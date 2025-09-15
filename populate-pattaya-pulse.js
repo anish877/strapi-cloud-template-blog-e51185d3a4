@@ -40,7 +40,7 @@ async function populatePattayaPulse() {
     // Create hashtags
     for (const hashtagData of hashtags) {
       try {
-        const response = await fetch('https://api.pattaya1.com/api/hashtags', {
+        const response = await fetch('http://localhost:1337/api/hashtags', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -191,7 +191,7 @@ async function populatePattayaPulse() {
         const hashtagIds = [];
         for (const hashtagName of photoData.hashtags) {
           try {
-            const hashtagResponse = await fetch(`https://api.pattaya1.com/api/hashtags?filters[name][$eq]=${hashtagName}`);
+            const hashtagResponse = await fetch(`http://localhost:1337/api/hashtags?filters[name][$eq]=${hashtagName}`);
             if (hashtagResponse.ok) {
               const hashtagData = await hashtagResponse.json();
               if (hashtagData.data && hashtagData.data.length > 0) {
@@ -222,7 +222,7 @@ async function populatePattayaPulse() {
           }
         };
 
-        const photoResponse = await fetch('https://api.pattaya1.com/api/photos', {
+        const photoResponse = await fetch('http://localhost:1337/api/photos', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

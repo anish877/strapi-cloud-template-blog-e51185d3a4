@@ -9,7 +9,7 @@
 
 ### Breaking News Endpoints
 ```
-Base URL: https://api.pattaya1.com/api
+Base URL: http://localhost:1337/api
 
 GET /breaking-news                    # Get all breaking news
 GET /breaking-news/:id               # Get specific article
@@ -44,7 +44,7 @@ PUT /news-settings                 # Update settings
 ### React/Next.js Example
 ```javascript
 // api/newsApi.js
-const API_BASE = 'https://api.pattaya1.com/api';
+const API_BASE = 'http://localhost:1337/api';
 
 export const newsApi = {
   // Get live breaking news
@@ -96,7 +96,7 @@ import { ref, onMounted } from 'vue'
 export function useNews() {
   const news = ref([])
   const loading = ref(false)
-  const API_BASE = 'https://api.pattaya1.com/api'
+  const API_BASE = 'http://localhost:1337/api'
 
   const fetchLiveNews = async () => {
     loading.value = true
@@ -147,7 +147,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class NewsService {
-  private apiBase = 'https://api.pattaya1.com/api';
+  private apiBase = 'http://localhost:1337/api';
 
   constructor(private http: HttpClient) {}
 
@@ -174,11 +174,11 @@ export class NewsService {
 ### Frontend .env file
 ```env
 # Development
-REACT_APP_API_URL=https://api.pattaya1.com/api
+REACT_APP_API_URL=http://localhost:1337/api
 # or
-VITE_API_URL=https://api.pattaya1.com/api
+VITE_API_URL=http://localhost:1337/api
 # or
-NEXT_PUBLIC_API_URL=https://api.pattaya1.com/api
+NEXT_PUBLIC_API_URL=http://localhost:1337/api
 
 # Production
 REACT_APP_API_URL=https://your-strapi-backend.com/api

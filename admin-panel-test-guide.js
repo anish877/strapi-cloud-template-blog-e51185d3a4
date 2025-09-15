@@ -7,8 +7,8 @@
 
 const axios = require('axios');
 
-const BASE_URL = 'https://api.pattaya1.com';
-const ADMIN_BASE_URL = 'https://api.pattaya1.com/admin';
+const BASE_URL = 'http://localhost:1337';
+const ADMIN_BASE_URL = 'http://localhost:1337/admin';
 
 class AdminPanelTester {
   constructor() {
@@ -132,7 +132,7 @@ class AdminPanelTester {
 
     browsers.forEach(browser => {
       console.log(`\n${browser.name}:`);
-      console.log(`   1. Open: https://api.pattaya1.com/admin`);
+      console.log(`   1. Open: http://localhost:1337/admin`);
       console.log(`   2. Hard refresh: ${browser.cache}`);
       console.log(`   3. Open DevTools: ${browser.devtools}`);
       console.log(`   4. Navigate to: Content Manager > Video`);

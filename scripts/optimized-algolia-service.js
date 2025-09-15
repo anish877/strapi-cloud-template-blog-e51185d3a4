@@ -10,7 +10,7 @@ class OptimizedAlgoliaService {
       process.env.ALGOLIA_API_KEY || 'your-admin-api-key'
     );
 
-    this.strapiBaseUrl = process.env.STRAPI_URL || 'https://api.pattaya1.com';
+    this.strapiBaseUrl = process.env.STRAPI_URL || 'http://localhost:1337';
     
     // Single unified index for all content types
     this.unifiedIndex = this.client.initIndex('unified_search');

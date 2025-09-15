@@ -7,7 +7,7 @@
 
 const axios = require('axios');
 
-const BASE_URL = 'https://api.pattaya1.com/api';
+const BASE_URL = 'http://localhost:1337/api';
 
 class VideoPopulator {
   constructor() {

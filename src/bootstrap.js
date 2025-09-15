@@ -1,6 +1,6 @@
 'use strict';
 
-const fs = require('fs-extra');
+const fs = require('fs');
 const path = require('path');
 const mime = require('mime-types');
 const admin = require('../config/firebase');
@@ -176,6 +176,8 @@ async function importSeedData() {
     'banned-keywords-video': ['find', 'findOne'],
     'video-search-keywords': ['find', 'findOne'],
     'trending-tags-video': ['find', 'findOne'],
+    'news-settings': ['find', 'findOne', 'create', 'update'],
+    'news-sources': ['find', 'findOne'],
   });
 
   console.log('Flight Tracker Widget permissions set up successfully');
@@ -215,19 +217,47 @@ module.exports = async ({ strapi }) => {
   
   await seedExampleApp();
   
-  // Initialize Video Scheduler for Featured Videos Widget
+  // Auto-start schedulers with graceful prerequisite handling
+  console.log('🚀 Starting schedulers with graceful prerequisite handling...');
+  
+  // Start News Scheduler with fallback
   try {
-    const VideoScheduler = require('./services/video-scheduler');
-    const videoScheduler = new VideoScheduler();
-    await videoScheduler.initialize();
+    const NewsSchedulerPath = path.join(process.cwd(), 'scripts', 'alternative-scheduler.js');
+    const NewsScheduler = require(NewsSchedulerPath);
+    const newsScheduler = new NewsScheduler();
     
-    // Store scheduler instance globally for access from other parts of the app
-    strapi.videoScheduler = videoScheduler;
+    setImmediate(() => {
+      newsScheduler.start().catch(error => {
+        console.log('⚠️  News Scheduler will retry when prerequisites are available:', error.message);
+      });
+    });
     
-    console.log('✅ Video Scheduler initialized successfully');
+    console.log('✅ News Scheduler started (will handle missing prerequisites gracefully)');
   } catch (error) {
-    console.error('❌ Error initializing Video Scheduler:', error);
+    console.log('⚠️  News Scheduler failed to initialize:', error.message);
   }
+  
+  // Start Video Scheduler with fallback
+  try {
+    const VideoSchedulerPath = path.join(process.cwd(), 'scripts', 'alternative-video-scheduler.js');
+    const AlternativeVideoScheduler = require(VideoSchedulerPath);
+    const videoScheduler = new AlternativeVideoScheduler();
+    
+    setImmediate(() => {
+      videoScheduler.start().catch(error => {
+        console.log('⚠️  Video Scheduler will retry when prerequisites are available:', error.message);
+      });
+    });
+    
+    console.log('✅ Video Scheduler started (has built-in fallback topics)');
+  } catch (error) {
+    console.log('⚠️  Video Scheduler failed to initialize:', error.message);
+  }
+  
+  console.log('📋 Manual trigger endpoints also available:');
+  console.log('   🎬 Video: POST /api/schedulers/video/start');
+  console.log('   🗞️  News: POST /api/schedulers/news/start');
+  console.log('   🚀 Both: POST /api/schedulers/start-all');
   
   console.log('✅ Flight Tracker Widget backend initialized successfully');
 };

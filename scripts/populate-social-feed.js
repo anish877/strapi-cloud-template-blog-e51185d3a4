@@ -9,7 +9,7 @@
 // @ts-ignore
 const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 
-const API_BASE = 'https://api.pattaya1.com/api';
+const API_BASE = 'http://localhost:1337/api';
 
 const samplePosts = [
   {

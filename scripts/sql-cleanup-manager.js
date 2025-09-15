@@ -86,7 +86,7 @@ class SQLCleanupManager {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
 
-      const response = await axios.get('https://api.pattaya1.com/api/news-settings', {
+      const response = await axios.get('http://localhost:1337/api/news-settings', {
         signal: controller.signal,
         timeout: 5000
       });
@@ -240,7 +240,7 @@ class SQLCleanupManager {
       const maxLimit = await this.getSettings();
 
       // Fetch articles ordered by createdAt desc (newest first)
-      const allArticles = await axios.get('https://api.pattaya1.com/api/breaking-news-plural?sort=createdAt:desc&pagination[limit]=200');
+      const allArticles = await axios.get('http://localhost:1337/api/breaking-news-plural?sort=createdAt:desc&pagination[limit]=200');
       const articles = allArticles.data?.data || [];
 
       const currentCount = articles.length;
@@ -254,7 +254,7 @@ class SQLCleanupManager {
       let deleted = 0;
       for (const article of toDelete) {
         try {
-          await axios.delete(`https://api.pattaya1.com/api/breaking-news-plural/${article.id}`);
+          await axios.delete(`http://localhost:1337/api/breaking-news-plural/${article.id}`);
           deleted++;
         } catch (err) {
           // continue on deletion errors

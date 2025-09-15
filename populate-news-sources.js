@@ -3,110 +3,100 @@
 const axios = require('axios');
 
 // Configuration
-const API_BASE_URL = 'https://api.pattaya1.com';
-const LOCAL_BASE_URL = 'https://api.pattaya1.com';
+const API_BASE_URL = 'http://localhost:1337';
+const LOCAL_BASE_URL = 'http://localhost:1337';
 
 // Common news sources for Pattaya/Thailand
 const newsSources = [
   {
     name: "Pattaya Mail",
     description: "Leading English-language newspaper in Pattaya",
-    sourceType: "rss",
-    url: "https://www.pattayamail.com/rss.xml",
+    sourceType: "rss_feed",
+    url: "http://www.pattayamail.com/rss.xml",
     isActive: true,
     priority: 1,
-    checkInterval: 300,
-    tags: ["pattaya", "local", "english", "news"]
+    fetchInterval: 5,
   },
   {
     name: "The Nation Thailand",
     description: "Major English-language daily newspaper",
-    sourceType: "rss", 
+    sourceType: "rss_feed", 
     url: "https://www.nationthailand.com/rss.xml",
     isActive: true,
     priority: 1,
-    checkInterval: 300,
-    tags: ["thailand", "english", "national", "news"]
+    fetchInterval: 300,
   },
   {
     name: "Bangkok Post",
     description: "Leading English-language newspaper in Thailand",
-    sourceType: "rss",
+    sourceType: "rss_feed",
     url: "https://www.bangkokpost.com/rss/data/topstories.xml",
     isActive: true,
     priority: 1,
-    checkInterval: 300,
-    tags: ["thailand", "bangkok", "english", "news"]
+    fetchInterval: 300,
   },
   {
     name: "Thai PBS World",
     description: "International news from Thailand",
-    sourceType: "rss",
+    sourceType: "rss_feed",
     url: "https://www.thaipbsworld.com/rss/",
     isActive: true,
     priority: 2,
-    checkInterval: 600,
-    tags: ["thailand", "international", "english", "news"]
+    fetchInterval: 600,
   },
   {
     name: "Pattaya One",
     description: "Local Pattaya news and events",
-    sourceType: "rss",
+    sourceType: "rss_feed",
     url: "https://pattayaone.net/feed/",
     isActive: true,
     priority: 2,
-    checkInterval: 600,
-    tags: ["pattaya", "local", "events", "news"]
+    fetchInterval: 600,
   },
   {
     name: "Pattaya Today",
     description: "Local Pattaya news website",
-    sourceType: "rss",
+    sourceType: "rss_feed",
     url: "https://www.pattayatoday.net/feed/",
     isActive: true,
     priority: 3,
-    checkInterval: 900,
-    tags: ["pattaya", "local", "news"]
+    fetchInterval: 900,
   },
   {
     name: "Chonburi News",
     description: "Chonburi province news (includes Pattaya)",
-    sourceType: "rss",
+    sourceType: "rss_feed",
     url: "https://www.chonburinews.com/feed/",
     isActive: true,
     priority: 3,
-    checkInterval: 900,
-    tags: ["chonburi", "pattaya", "provincial", "news"]
+    fetchInterval: 900,
   },
   {
     name: "Thailand News",
     description: "General Thailand news aggregator",
-    sourceType: "rss",
+    sourceType: "rss_feed",
     url: "https://www.thailandnews.net/feed/",
     isActive: true,
     priority: 4,
-    checkInterval: 1200,
-    tags: ["thailand", "general", "news"]
+    fetchInterval: 1200,
   },
   {
     name: "Pattaya News",
     description: "Local Pattaya news and updates",
-    sourceType: "rss",
+    sourceType: "rss_feed",
     url: "https://www.pattayanews.net/feed/",
     isActive: true,
     priority: 4,
-    checkInterval: 1200,
-    tags: ["pattaya", "local", "updates", "news"]
+    fetchInterval: 1200,
   },
   {
     name: "Thai Visa News",
     description: "Thailand visa and expat news",
-    sourceType: "rss",
+    sourceType: "rss_feed",
     url: "https://www.thaivisa.com/forum/forum/1-thailand-news/feed/",
     isActive: true,
     priority: 5,
-    checkInterval: 1800,
-    tags: ["thailand", "expat", "visa", "forum", "news"]
+    fetchInterval: 1800,
   }
 ];
 
@@ -119,7 +109,7 @@ class NewsSourcePopulator {
   async testConnection() {
     try {
       console.log(`🔍 Testing connection to ${this.baseUrl}...`);
-      const response = await axios.get(`${this.baseUrl}/api/`, { timeout: 10000 });
+      const response = await axios.get(`${this.baseUrl}/api/news-sources`, { timeout: 10000 });
       console.log(`✅ Connection successful to ${this.baseUrl}`);
       return true;
     } catch (error) {

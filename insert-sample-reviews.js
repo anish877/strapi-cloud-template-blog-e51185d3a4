@@ -195,7 +195,7 @@ async function insertSampleReviews() {
     
     console.log('\n🎉 Sample reviews inserted successfully!');
     console.log('\n🔍 You can now test:');
-    console.log('1. API endpoint: curl "https://api.pattaya1.com/api/reviews/latest?limit=5"');
+    console.log('1. API endpoint: curl "http://localhost:1337/api/reviews/latest?limit=5"');
     console.log('2. Frontend widget: Start the frontend and visit the homepage');
 
   } catch (error) {

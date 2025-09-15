@@ -171,7 +171,7 @@ async function createSampleReviews() {
     console.log('\n🔍 You can now test the frontend widget by:');
     console.log('1. Starting the frontend: cd ../pattaya1 && npm run dev');
     console.log('2. Visiting the homepage to see the reviews widget');
-    console.log('3. Testing the API endpoint: curl "https://api.pattaya1.com/api/reviews/latest?limit=5"');
+    console.log('3. Testing the API endpoint: curl "http://localhost:1337/api/reviews/latest?limit=5"');
     
   } catch (error) {
     console.error('❌ Error creating sample reviews:', error.message);

@@ -7,7 +7,7 @@ This guide provides all the endpoints, data structures, and integration examples
 ## 📡 Base Configuration
 
 ```javascript
-const API_BASE_URL = 'https://api.pattaya1.com/api';
+const API_BASE_URL = 'http://localhost:1337/api';
 // In production: https://your-domain.com/api
 ```
 
@@ -375,7 +375,7 @@ export default YouTubeVideoWidget;
 class YouTubeVideoWidget {
   constructor(containerId, options = {}) {
     this.container = document.getElementById(containerId);
-    this.apiBaseUrl = options.apiBaseUrl || 'https://api.pattaya1.com/api';
+    this.apiBaseUrl = options.apiBaseUrl || 'http://localhost:1337/api';
     this.showSponsored = options.showSponsored !== false;
   }
 
@@ -464,7 +464,7 @@ class YouTubeVideoWidget {
 
 // Usage
 const widget = new YouTubeVideoWidget('video-container', {
-  apiBaseUrl: 'https://api.pattaya1.com/api',
+  apiBaseUrl: 'http://localhost:1337/api',
   showSponsored: true
 });
 

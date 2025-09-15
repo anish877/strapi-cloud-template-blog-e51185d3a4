@@ -1,6 +1,6 @@
 #!/bin/bash
 
-API_BASE_URL="https://api.pattaya1.com"
+API_BASE_URL="http://localhost:1337"
 
 echo "🎯 Populating Pattaya News Sources..."
 

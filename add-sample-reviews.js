@@ -92,7 +92,7 @@ async function addSampleReviews() {
 
   try {
     // Create reviews directly using fetch to Strapi API
-    const baseUrl = 'https://api.pattaya1.com';
+    const baseUrl = 'http://localhost:1337';
     let successCount = 0;
     let errorCount = 0;
 
@@ -128,7 +128,7 @@ async function addSampleReviews() {
     if (successCount > 0) {
       console.log('\n🎉 Sample reviews added successfully!');
       console.log('\n🔍 You can now test:');
-      console.log('1. API endpoint: curl "https://api.pattaya1.com/api/reviews/latest?limit=5"');
+      console.log('1. API endpoint: curl "http://localhost:1337/api/reviews/latest?limit=5"');
       console.log('2. Frontend widget: Start the frontend and visit the homepage');
     }
     

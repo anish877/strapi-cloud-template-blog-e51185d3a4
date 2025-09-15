@@ -2,7 +2,7 @@ const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
 
-const STRAPI_URL = 'https://api.pattaya1.com';
+const STRAPI_URL = 'http://localhost:1337';
 
 async function importFlightData() {
   try {
