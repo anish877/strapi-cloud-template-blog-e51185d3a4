@@ -74,22 +74,81 @@ module.exports = createCoreService('api::breaking-news.breaking-news', ({ strapi
   },
 
   /**
-   * Fetch and normalize articles from a single RSS feed
+   * Fetch and normalize articles from a single RSS feed with image extraction
    */
   async fetchFromRSS(rssUrl, sourceName) {
     try {
       if (!rssUrl) return [];
-      const parser = new Parser();
+      
+      // Enhanced parser with custom fields for media extraction
+      const parser = new Parser({
+        customFields: {
+          item: [
+            ['media:content', 'mediaContent'],
+            ['media:thumbnail', 'mediaThumbnail'],
+            ['enclosure', 'enclosure'],
+            ['description', 'fullDescription']
+          ]
+        }
+      });
+      
       const feed = await parser.parseURL(rssUrl);
       if (!feed || !Array.isArray(feed.items)) return [];
 
-      return feed.items.map(item => ({
-        title: item.title || item.contentSnippet || 'No Title',
-        description: item.contentSnippet || item.content || '',
-        url: item.link,
-        publishedAt: item.isoDate || item.pubDate || new Date().toISOString(),
-        source: { name: sourceName || feed.title || 'RSS' }
-      }));
+      return feed.items.map(item => {
+        // Extract featured image using multiple methods
+        let featuredImage = null;
+        let imageAlt = '';
+        let imageCaption = '';
+        
+        // Method 1: Check RSS media fields
+        if (item.mediaContent && item.mediaContent.url) {
+          featuredImage = item.mediaContent.url;
+        } else if (item.mediaThumbnail && item.mediaThumbnail.url) {
+          featuredImage = item.mediaThumbnail.url;
+        } else if (item.enclosure && item.enclosure.url && item.enclosure.type && item.enclosure.type.startsWith('image/')) {
+          featuredImage = item.enclosure.url;
+        }
+        
+        // Method 2: Extract from HTML content
+        if (!featuredImage) {
+          const contentToSearch = item.content || item.description || item.fullDescription || '';
+          const imgRegex = /<img[^>]+src="([^">]+)"/i;
+          const match = imgRegex.exec(contentToSearch);
+          if (match) {
+            featuredImage = match[1];
+            
+            // Extract alt text
+            const altRegex = /<img[^>]+alt="([^">]*)"/i;
+            const altMatch = altRegex.exec(contentToSearch);
+            if (altMatch) {
+              imageAlt = altMatch[1];
+            }
+          }
+        }
+        
+        // Ensure full URL for relative paths
+        if (featuredImage && !featuredImage.startsWith('http')) {
+          try {
+            const sourceUrl = new URL(rssUrl);
+            featuredImage = `${sourceUrl.protocol}//${sourceUrl.hostname}${featuredImage.startsWith('/') ? '' : '/'}${featuredImage}`;
+          } catch (urlError) {
+            strapi.log.warn(`Failed to resolve relative image URL: ${featuredImage}`);
+          }
+        }
+
+        return {
+          title: item.title || item.contentSnippet || 'No Title',
+          description: item.contentSnippet || item.content || '',
+          url: item.link,
+          publishedAt: item.isoDate || item.pubDate || new Date().toISOString(),
+          source: { name: sourceName || feed.title || 'RSS' },
+          // Enhanced: Include image data
+          featuredImage,
+          imageAlt,
+          imageCaption
+        };
+      });
     } catch (error) {
       strapi.log.error(`Failed to fetch RSS from ${sourceName || rssUrl}:`, error.message);
       return [];
@@ -100,36 +159,49 @@ module.exports = createCoreService('api::breaking-news.breaking-news', ({ strapi
    * Fetch from all active non-API sources (e.g., RSS) defined in news-sources
    */
   async fetchFromActiveSources() {
-    // @ts-ignore
-    const sources = await strapi.entityService.findMany('api::news-source.news-source', {
-      filters: {
-        isActive: true,
-        sourceType: 'rss_feed'
-      },
-      fields: ['id', 'name', 'rssUrl', 'totalArticlesFetched']
-    });
-    const allArticles = [];
-    const list = Array.isArray(sources) ? sources : [];
-    for (const src of list) {
-      const items = await this.fetchFromRSS(src.rssUrl, src.name);
-      allArticles.push(...items);
+    try {
+      // @ts-ignore - Strapi entity service typing is too strict for custom fields
+      const sources = await strapi.entityService.findMany('api::news-source.news-source', {
+        filters: {
+          isActive: true,
+          sourceType: 'rss_feed'
+        },
+        fields: ['id', 'name', 'rssUrl', 'totalArticlesFetched']
+      });
+      
+      const allArticles = [];
+      const sourceList = Array.isArray(sources) ? sources : [];
+      
+      for (const source of sourceList) {
+        try {
+          // @ts-ignore - Custom fields not in TypeScript definitions
+          const items = await this.fetchFromRSS(source.rssUrl, source.name);
+          allArticles.push(...items);
 
-      // Update source telemetry
-      try {
-        // @ts-ignore
-        await strapi.entityService.update('api::news-source.news-source', src.id, {
-          data: {
-            lastFetchedAt: new Date(),
-            lastFetchStatus: items.length > 0 ? 'success' : 'pending',
-            totalArticlesFetched: (src.totalArticlesFetched || 0) + (items.length || 0)
+          // Update source telemetry
+          try {
+            // @ts-ignore - Strapi entity service typing issue
+            await strapi.entityService.update('api::news-source.news-source', source.id, {
+              data: {
+                lastFetchedAt: new Date(),
+                lastFetchStatus: items.length > 0 ? 'success' : 'pending',
+                // @ts-ignore - Custom field not in TypeScript definitions
+                totalArticlesFetched: (source.totalArticlesFetched || 0) + (items.length || 0)
+              }
+            });
+          } catch (updateError) {
+            strapi.log.warn(`Failed to update source telemetry for ${source.name}:`, updateError.message);
           }
-        });
-      } catch (e) {
-        // Best effort, ignore
+        } catch (fetchError) {
+          strapi.log.error(`Failed to fetch from source ${source.name}:`, fetchError.message);
+        }
       }
-    }
 
-    return allArticles;
+      return allArticles;
+    } catch (error) {
+      strapi.log.error('Failed to fetch from active sources:', error.message);
+      return [];
+    }
   },
 
   async checkModerationKeywords(title, summary) {
@@ -168,13 +240,13 @@ module.exports = createCoreService('api::breaking-news.breaking-news', ({ strapi
         article.description || ''
       );
 
-      // Create breaking news entry
+      // Create breaking news entry with image data
       const breakingNews = await strapi.entityService.create('api::breaking-news.breaking-news', {
         data: {
           Title: article.title || 'No Title',
-          Summary: article.description || 'No Summary',
-          Category: 'General',
-          Source: article.source?.name || 'Unknown',
+          Summary: article.description || '',
+          Category: article.source?.name || sourceName,
+          Source: sourceName,
           URL: article.url,
           IsBreaking: false,
           PublishedTimestamp: article.publishedAt ? new Date(article.publishedAt) : new Date(),
@@ -187,6 +259,10 @@ module.exports = createCoreService('api::breaking-news.breaking-news', ({ strapi
           fetchedFromAPI: true,
           apiSource: 'NewsAPI',
           originalAPIData: article,
+          // Enhanced: Include image fields
+          FeaturedImage: article.featuredImage || null,
+          ImageAlt: article.imageAlt || null,
+          ImageCaption: article.imageCaption || null,
           publishedAt: moderationStatus === 'approved' ? new Date() : null
         }
       });
